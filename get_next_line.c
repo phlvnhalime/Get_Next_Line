@@ -20,11 +20,12 @@ void	linked_next_call(t_list **list)
 	int		j;
 	char	*buf;
 
-	last_node = found_last_node(*list);
+	last_node = NULL;
 	buf = malloc(BUFFER_SIZE + 1);
 	clean_node = malloc(sizeof(t_list));
 	if (buf == NULL || clean_node == NULL)
 		return ;
+	last_node = found_last_node(*list);
 	i = 0;
 	j = 0;
 	while (last_node->str_buf[i] && last_node->str_buf[i] != '\n')
@@ -59,7 +60,6 @@ void	appended_words(t_list **list, char *buf)
 	t_list	*new_node;
 	t_list	*last_node;
 
-	last_node = NULL;
 	new_node = malloc(sizeof(t_list));
 	if (new_node == NULL)
 		return ;
@@ -83,10 +83,16 @@ void	create_list(t_list **list, int fd)
 		if (buf == NULL)
 			return ;
 		char_read = read(fd, buf, BUFFER_SIZE);
-		if (char_read <= 0)
+		if (char_read < 0)
 		{
 			free(buf);
+			clean(list, NULL, NULL);
 			return ;
+		}
+		if (char_read == 0)
+		{
+			free(buf);
+			break ;
 		}
 		buf[char_read] = '\0';
 		appended_words(list, buf);
@@ -99,8 +105,11 @@ char	*get_next_line(int fd)
 	char			*next_line;
 
 	next_line = NULL;
-	if (fd < 0 || BUFFER_SIZE == 0 || read(fd, next_line, 0) < 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, next_line, 0) < 0)
+	{
+		clean(&list, NULL, NULL);
 		return (NULL);
+	}
 	create_list(&list, fd);
 	if (list == NULL)
 		return (NULL);

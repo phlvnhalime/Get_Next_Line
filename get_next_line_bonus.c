@@ -27,12 +27,6 @@ void	linked_next_call(t_list **list)
 		return ;
 	buf = malloc((BUFFER_SIZE + 1) * sizeof(char));
 	clean_node = malloc(sizeof(t_list));
-	if (!buf || !clean_node)
-	{
-		free(buf);
-		free(clean_node);
-		return ;
-	}
 	i = 0;
 	j = 0;
 	while (last_node->str_buf[i] && last_node->str_buf[i] != '\n')
@@ -112,9 +106,8 @@ char	*get_next_line(int fd)
 	static t_list	*list[4096];
 	char			*next_line;
 
-	if (fd < 0 || fd > 4095 || BUFFER_SIZE <= 0)
-		return (NULL);
-	if (read(fd, NULL, 0) < 0)
+	next_line = NULL;
+	if (fd < 0 || BUFFER_SIZE == 0 || read(fd, next_line, 0) < 0)
 	{
 		clean(&list[fd], NULL, NULL);
 		return (NULL);
@@ -127,7 +120,7 @@ char	*get_next_line(int fd)
 	if (!next_line)
 	{
 		clean(&list[fd], NULL, NULL);
-		return (NULL);
+		list[fd] = NULL;
 	}
 	return (next_line);
 }

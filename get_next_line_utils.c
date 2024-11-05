@@ -79,8 +79,10 @@ void	clean(t_list **list, t_list *clean_node, char *buf)
 		free(*list);
 		*list = ptr;
 	}
-	if (clean_node->str_buf[0])
+	if (clean_node && clean_node->str_buf && clean_node->str_buf[0])
+	{
 		*list = clean_node;
+	}
 	else
 	{
 		free(buf);
