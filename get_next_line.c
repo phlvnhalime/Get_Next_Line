@@ -11,7 +11,13 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-
+/*
+*	linked_next_call -- Updates the linked list to handle data after the newline.
+*			    Moves the remaining data from the last node's buffer 
+*			    to a new node and clears the buffer of the old node.
+*	@list: Pointer to head of the linked list.
+*/
+	
 void	linked_next_call(t_list **list)
 {
 	t_list	*last_node;
@@ -20,23 +26,28 @@ void	linked_next_call(t_list **list)
 	int		j;
 	char	*buf;
 
+	// Initialized pointers and allocate buffer for remaining characters.
 	last_node = NULL;
 	buf = malloc(BUFFER_SIZE + 1);
 	clean_node = malloc(sizeof(t_list));
 	if (buf == NULL || clean_node == NULL)
 		return ;
+	// Find the last node in the list where the newline is located.
 	last_node = found_last_node(*list);
 	i = 0;
 	j = 0;
+	// Move past the newline in the buffer!
 	while (last_node->str_buf[i] && last_node->str_buf[i] != '\n')
 		i++;
 	if (last_node->str_buf[i] == '\n')
 		i++;
+	// Copy remaining characters after newline into the new buffer.
 	while (last_node->str_buf[i])
 		buf[j++] = last_node->str_buf[i++];
-	buf[j] = '\0';
+	buf[j] = '\0'; // NULL-terminate the buffer.
 	clean_node->str_buf = buf;
 	clean_node->next = NULL;
+	// Call clean to handle the linked list cleanup and management.
 	clean(list, clean_node, buf);
 }
 
